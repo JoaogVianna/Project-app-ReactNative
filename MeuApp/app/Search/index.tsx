@@ -5,6 +5,8 @@ import ProductCard from "../../components/ProductCard";
 
 export default function SearchScreen() {
   const [query, setQuery] = useState("");
+
+  // Agora retorna todos os produtos
   const { products } = useProducts();
 
   const results = products.filter((p) =>

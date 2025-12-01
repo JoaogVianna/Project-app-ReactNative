@@ -1,66 +1,41 @@
+// hooks/useFavorites.ts
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Product } from "../types/product";
 
-const STORAGE_KEY = "@meus_favoritos";
+const KEY = "FAVORITE_PRODUCTS";
 
-export default function useFavorites() {
-  const [favorites, setFavorites] = useState<string[]>([]);
+export function useFavorites() {
+  const [favorites, setFavorites] = useState<Product[]>([]);
 
-  // Carregar favoritos ao iniciar o app
+  // Carrega favoritos
   useEffect(() => {
     loadFavorites();
   }, []);
 
-  // Carrega do AsyncStorage
   async function loadFavorites() {
-    try {
-      const data = await AsyncStorage.getItem(STORAGE_KEY);
-      if (data) {
-        setFavorites(JSON.parse(data));
-      }
-    } catch (error) {
-      console.log("Erro ao carregar favoritos:", error);
-    }
+    const json = await AsyncStorage.getItem(KEY);
+    if (json) setFavorites(JSON.parse(json));
   }
 
-  // Salva no AsyncStorage
-  async function saveFavorites(list: string[]) {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-    } catch (error) {
-      console.log("Erro ao salvar favoritos:", error);
-    }
-  }
+  async function toggleFavorite(product: Product) {
+    let updated = [...favorites];
 
-  // Adicionar favorito
-  async function addFavorite(id: string) {
-    if (!favorites.includes(id)) {
-      const updated = [...favorites, id];
-      setFavorites(updated);
-      await saveFavorites(updated);
-    }
-  }
+    const exists = updated.find((p) => p.id === product.id);
 
-  // Remover favorito
-  async function removeFavorite(id: string) {
-    const updated = favorites.filter(item => item !== id);
-    setFavorites(updated);
-    await saveFavorites(updated);
-  }
-
-  // Alternar (caso queira usar com um botão)
-  async function toggleFavorite(id: string) {
-    if (favorites.includes(id)) {
-      await removeFavorite(id);
+    if (exists) {
+      updated = updated.filter((p) => p.id !== product.id);
     } else {
-      await addFavorite(id);
+      updated.push(product);
     }
+
+    setFavorites(updated);
+    await AsyncStorage.setItem(KEY, JSON.stringify(updated));
   }
 
-  return {
-    favorites,
-    addFavorite,
-    removeFavorite,
-    toggleFavorite,
-  };
+  function isFavorite(id: string) {
+    return favorites.some((p) => p.id === id);
+  }
+
+  return { favorites, toggleFavorite, isFavorite };
 }
