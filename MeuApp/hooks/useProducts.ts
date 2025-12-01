@@ -1,3 +1,4 @@
+// hooks/useProducts.ts
 import { useState, useEffect } from "react";
 
 const PRODUCTS: Record<string, any[]> = {
@@ -16,12 +17,16 @@ const PRODUCTS: Record<string, any[]> = {
   ],
 };
 
-export function useProducts(subcategoryId: string) {
+export function useProducts(subcategoryId?: string) {
   const [products, setProducts] = useState<any[]>([]);
 
   useEffect(() => {
     if (subcategoryId) {
       setProducts(PRODUCTS[subcategoryId] || []);
+    } else {
+      // junta tudo para a página de busca
+      const all = Object.values(PRODUCTS).flat();
+      setProducts(all);
     }
   }, [subcategoryId]);
 
