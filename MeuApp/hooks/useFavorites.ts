@@ -7,21 +7,29 @@ const KEY = "FAVORITE_PRODUCTS";
 
 export function useFavorites() {
   const [favorites, setFavorites] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Carrega favoritos
+  // Carregar favoritos ao iniciar
   useEffect(() => {
     loadFavorites();
   }, []);
 
   async function loadFavorites() {
-    const json = await AsyncStorage.getItem(KEY);
-    if (json) setFavorites(JSON.parse(json));
+    try {
+      const json = await AsyncStorage.getItem(KEY);
+      if (json) {
+        setFavorites(JSON.parse(json));
+      }
+    } catch (e) {
+      console.log("Erro ao carregar favoritos:", e);
+    }
+    setLoading(false);
   }
 
   async function toggleFavorite(product: Product) {
     let updated = [...favorites];
 
-    const exists = updated.find((p) => p.id === product.id);
+    const exists = updated.some((p) => p.id === product.id);
 
     if (exists) {
       updated = updated.filter((p) => p.id !== product.id);
@@ -37,5 +45,5 @@ export function useFavorites() {
     return favorites.some((p) => p.id === id);
   }
 
-  return { favorites, toggleFavorite, isFavorite };
+  return { favorites, toggleFavorite, isFavorite, loading };
 }
