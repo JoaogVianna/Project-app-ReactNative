@@ -1,16 +1,41 @@
 // app/_layout.tsx
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { StyleSheet } from "react-native";
 
 export default function Layout() {
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarShowLabel: true,
+        tabBarActiveTintColor: "#ffffff",
+        tabBarInactiveTintColor: "#cfe9d3",
+        tabBarStyle: {
+          backgroundColor: "#2E7D32",
+          height: 70,
+          paddingBottom: 8,
+          paddingTop: 8,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          position: "absolute",
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "600",
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Busca",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="search" size={size} color={color} />
+          title: "Buscar",
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name="search-outline"
+              size={focused ? size + 6 : size}
+              color={color}
+            />
           ),
         }}
       />
@@ -18,9 +43,13 @@ export default function Layout() {
       <Tabs.Screen
         name="Scan"
         options={{
-          title: "Scan",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="barcode" size={size} color={color} />
+          title: "Escanear",
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name="barcode-outline"
+              size={focused ? size + 6 : size}
+              color={color}
+            />
           ),
         }}
       />
@@ -28,9 +57,13 @@ export default function Layout() {
       <Tabs.Screen
         name="Saved"
         options={{
-          title: "Salvos",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="bookmark" size={size} color={color} />
+          title: "Favoritos",
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "bookmark" : "bookmark-outline"}
+              size={focused ? size + 6 : size}
+              color={color}
+            />
           ),
         }}
       />

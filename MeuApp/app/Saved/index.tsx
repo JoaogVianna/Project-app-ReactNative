@@ -1,50 +1,109 @@
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { useState } from "react";
+import { View, Text, ScrollView, StyleSheet, TextInput } from "react-native";
 import ProductCard from "../../components/ProductCard";
 import { useFavorites } from "../../hooks/useFavorites";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function FavoritesScreen() {
   const { favorites, loading } = useFavorites();
+  const [search, setSearch] = useState("");
 
   if (loading) {
-    return <Text style={styles.loading}>Carregando...</Text>;
+    return (
+      <View style={styles.center}>
+        <Text style={styles.loading}>Carregando...</Text>
+      </View>
+    );
   }
 
+  // 🔍 FILTRO CORRIGIDO (usa name ao invés de title)
+  const filtered = favorites.filter((fav) =>
+    fav.name?.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Favoritos</Text>
+    <LinearGradient
+      colors={["#4CAF50", "#2E7D32"]}
+      style={{ flex: 1 }}
+    >
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>Favoritos</Text>
 
-      {favorites.length === 0 && (
-        <Text style={styles.empty}>Nenhum favorito ainda.</Text>
-      )}
+        {/* 🔍 Busca */}
+        <TextInput
+          style={styles.search}
+          placeholder="Buscar favorito..."
+          placeholderTextColor="#cce8d0"
+          value={search}
+          onChangeText={setSearch}
+        />
 
-      <View style={styles.grid}>
-        {favorites.map((prod) => (
-          <ProductCard key={prod.id} product={prod} />
-        ))}
-      </View>
-    </ScrollView>
+        {/* Caso vazio */}
+        {filtered.length === 0 && (
+          <Text style={styles.empty}>Nenhum favorito encontrado.</Text>
+        )}
+
+        {/* Grid */}
+        <View style={styles.grid}>
+          {filtered.map((prod) => (
+            <ProductCard key={prod.id} product={prod} />
+          ))}
+        </View>
+      </ScrollView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20 },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 16,
+  container: {
+    padding: 20,
+    paddingBottom: 60,
   },
+
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 20,
+    textAlign: "center",
+    letterSpacing: 0.5,
+  },
+
+  search: {
+    backgroundColor: "rgba(255,255,255,0.18)",
+    padding: 14,
+    borderRadius: 14,
+    color: "#fff",
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.25)",
+  },
+
   empty: {
     textAlign: "center",
-    marginTop: 20,
-    opacity: 0.6,
+    marginTop: 40,
+    color: "#fff",
+    opacity: 0.8,
+    fontSize: 16,
   },
+
   loading: {
-    marginTop: 50,
-    textAlign: "center",
+    fontSize: 18,
+    color: "#fff",
   },
+
+  center: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#2E7D32",
+  },
+
   grid: {
+    marginTop: 10,
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 12,
+    gap: 16,
+    justifyContent: "center",
   },
 });
